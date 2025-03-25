@@ -7,8 +7,8 @@ influencers_in = "influencers.txt"
 mappings_in = "JSON-Image_files_mapping.txt"
 influencers_out = "smallInfluencers.txt"
 mappings_out = "smallMappings.txt"
-INFLUENCERS_PER_CATEGORY = 20
-POSTS_PER_INFLUENCER = 50
+INFLUENCERS_PER_CATEGORY = 200
+POSTS_PER_INFLUENCER = 5
 
 # First pass: Process influencers.txt to select at most INFLUENCERS_PER_CATEGORY influencers per category
 # and, for each selected influencer, only the first POSTS_PER_INFLUENCER posts.
