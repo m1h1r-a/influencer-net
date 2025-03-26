@@ -5,7 +5,7 @@ import tensorflow as tf
 from PIL import Image
 from tensorflow.keras.applications.efficientnet_v2 import preprocess_input
 
-# Define paths (update these if needed)
+# Paths defined
 base_dir = "/home/m1h1r/Documents/[2] dev/influencer-net"
 ssd_dir = "/run/media/m1h1r/04E884E1E884D1FA"
 image_dir = os.path.join(base_dir, "image")
@@ -17,10 +17,7 @@ target_size = (224, 224)
 
 
 def load_mapping(mapping_path):
-    """
-    Reads the influencer mapping file and returns a dictionary
-    mapping username to category.
-    """
+    # dictionary for username -> category
     mapping = {}
     with open(mapping_path, "r") as f:
         for line in f:
@@ -34,18 +31,15 @@ def load_mapping(mapping_path):
 
 
 def process_and_save_image(image_path, username, category):
-    """
-    Load the image, resize, preprocess, and save as a .npy file
-    in the appropriate category folder.
-    """
+    # load image, resize to 224, convert to float, expand dimensions, sned to preprocess function, save as numpy array
     try:
-        # Open image and convert to RGB
+        # conver to rgb
         img = Image.open(image_path).convert("RGB")
-        # Resize image to target size
+        # convert to target_size
         img = img.resize(target_size)
-        # Convert image to numpy array (float32)
+        # convert image to numpy array (float32) -> required by efficientnet_v2
         img_array = np.array(img).astype(np.float32)
-        # Expand dims to simulate batch of 1 (if required by preprocess_input)
+        # expand dimensions of image
         img_batch = np.expand_dims(img_array, axis=0)
         # Preprocess image using EfficientNetV2's preprocess_input (scales to [-1, 1])
         preprocessed = preprocess_input(img_batch)
@@ -68,18 +62,18 @@ def process_and_save_image(image_path, username, category):
 
 
 def main():
-    # Load influencer to category mapping
+    # return dictionary to map username to category
     mapping = load_mapping(mapping_file)
 
     # Process each image in the image directory
     for filename in os.listdir(image_dir):
         if filename.lower().endswith((".jpg", ".jpeg", ".png")):
-            # The influencer username is the part before the dash '-'
+
             if "-" not in filename:
                 print(f"Filename {filename} does not have the expected '-' separator.")
                 continue
             username = filename.split("-")[0]
-            # Get the corresponding category from the mapping file
+            # get category from mapping dict
             if username not in mapping:
                 print(f"Username {username} not found in mapping. Skipping {filename}.")
                 continue
