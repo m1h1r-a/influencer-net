@@ -6,11 +6,11 @@ from tensorflow.keras.applications.efficientnet_v2 import (
     preprocess_input,
 )
 
-sample_image_path = "/run/media/m1h1r/04E884E1E884D1FA/preprocessedImages/food/simplywhisked-1660001007436771654.npy"
+sample_image_path = "/run/media/m1h1r/04E884E1E884D1FA/compressedPreprocessedImages/food/simplywhisked-1660001007436771654.npz"
 
-# Load the preprocessed image
-img = np.load(sample_image_path)
-
+# Load the compressed .npz file
+with np.load(sample_image_path) as data:
+    img = data["arr_0"]  # Extract the stored array
 
 # Print out the original shape and pixel range to verify integrity
 print("Original image shape:", img.shape)
