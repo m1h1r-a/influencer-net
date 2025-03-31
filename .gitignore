@@ -1,6 +1,3 @@
 image/
 testImage/
-influencers.txt
-JSON-Image_files_mapping.txt
-testPreProcess.py
-NotesImgPreprocessing.md
+mainDataset/
