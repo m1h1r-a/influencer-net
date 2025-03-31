@@ -3,14 +3,13 @@ import os
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from tensorflow.keras.applications.efficientnet_v2 import preprocess_input
 
 # Paths defined
 base_dir = "/home/m1h1r/Documents/[2] dev/influencer-net"
 ssd_dir = "/run/media/m1h1r/04E884E1E884D1FA"
 image_dir = os.path.join(base_dir, "image")
 mapping_file = os.path.join(base_dir, "data_sampling/smallInfluencers.txt")
-output_base = os.path.join(ssd_dir, "compressedPreprocessedImages")
+output_base = os.path.join(ssd_dir, "tfCompressedPreprocessedImages")
 
 # Define the target image size for EfficientNetV2‑S (224×224)
 target_size = (224, 224)
@@ -29,15 +28,57 @@ def load_mapping(mapping_path):
     return mapping
 
 
+def preprocess_for_train(image, target_size):
+    """Applies training augmentations: random crop, random flip, resize, and normalization.
+
+    Args:
+      image: a tf.Tensor of shape [height, width, 3] with pixel values in [0, 255].
+      target_size: tuple (height, width) for the output image.
+
+    Returns:
+      A tf.Tensor with shape target_size and pixel values normalized to [-1, 1].
+    """
+    # Ensure image has a statically unknown shape
+    image = tf.convert_to_tensor(image, dtype=tf.float32)
+
+    # Get image shape
+    shape = tf.shape(image)
+    # Random crop: using a random distorted bounding box
+    begin, size, _ = tf.image.sample_distorted_bounding_box(
+        shape,
+        tf.zeros([0, 0, 4], tf.float32),
+        area_range=(0.05, 1.0),
+        min_object_covered=0,
+        use_image_if_no_bounding_boxes=True,
+    )
+    cropped = tf.slice(image, begin, size)
+
+    # Resize the cropped image to the target size using bilinear interpolation.
+    resized = tf.image.resize(cropped, target_size)
+
+    # Random horizontal flip.
+    flipped = tf.image.random_flip_left_right(resized)
+
+    # Normalize image to [-1, 1]
+    normalized = (flipped - 128.0) / 128.0
+
+    return normalized
+
+
 def process_and_save_image(image_path, username, category):
-    """Process an image and save it as a compressed numpy file."""
+    """Process an image using training augmentation and save it as a compressed numpy file."""
     try:
-        # Load and preprocess the image
+        # Load image using PIL and convert to RGB
         img = Image.open(image_path).convert("RGB")
-        img = img.resize(target_size)
+        # Optionally resize to a slightly larger size if you want to allow cropping;
+        # here we keep it at target_size for simplicity (256x256 original images become 224x224 after processing)
+        img = img.resize((256, 256))
         img_array = np.array(img).astype(np.float32)
-        img_batch = np.expand_dims(img_array, axis=0)
-        preprocessed = preprocess_input(img_batch)[0]  # Remove batch dimension
+
+        # Apply training preprocessing
+        preprocessed_tensor = preprocess_for_train(img_array, target_size)
+        # Convert back to numpy array for saving.
+        preprocessed = preprocessed_tensor.numpy()
     except Exception as e:
         print(f"Error processing {image_path}: {e}")
         return
@@ -57,7 +98,7 @@ def process_and_save_image(image_path, username, category):
 
 
 def main():
-    # return dictionary to map username to category
+    # Return dictionary to map username to category
     mapping = load_mapping(mapping_file)
 
     # Process each image in the image directory
