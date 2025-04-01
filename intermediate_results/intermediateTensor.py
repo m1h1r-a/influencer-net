@@ -114,7 +114,7 @@ def process_and_save_image(image_path, username, category):
 
 
 def main():
-    """Loads mapping, processes images, and saves results."""
+    # load mapping
     mapping = load_mapping(mapping_file)
 
     for filename in os.listdir(image_dir):

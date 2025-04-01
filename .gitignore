@@ -1,3 +1,4 @@
 image/
 testImage/
-mainDataset/
+mainDataset
+intermediate_results/notesImgPreprocessing.md

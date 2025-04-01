@@ -38,12 +38,13 @@ def preprocess_for_train(image, target_size):
     Returns:
       A tf.Tensor with shape target_size and pixel values normalized to [-1, 1].
     """
-    # Ensure image has a statically unknown shape
+    # conver to tensor, random crop it, resize, to 224x224, random flipping, normalization to [-1,1]
+
     image = tf.convert_to_tensor(image, dtype=tf.float32)
 
-    # Get image shape
+    # image shape
     shape = tf.shape(image)
-    # Random crop: using a random distorted bounding box
+    # random crop
     begin, size, _ = tf.image.sample_distorted_bounding_box(
         shape,
         tf.zeros([0, 0, 4], tf.float32),
@@ -53,7 +54,7 @@ def preprocess_for_train(image, target_size):
     )
     cropped = tf.slice(image, begin, size)
 
-    # Resize the cropped image to the target size using bilinear interpolation.
+    # resize the cropped image to the target size using bilinear interpolation.
     resized = tf.image.resize(cropped, target_size)
 
     # Random horizontal flip.
@@ -62,31 +63,32 @@ def preprocess_for_train(image, target_size):
     # Normalize image to [-1, 1]
     normalized = (flipped - 128.0) / 128.0
 
+    # shape is target_size normalized
     return normalized
 
 
 def process_and_save_image(image_path, username, category):
     """Process an image using training augmentation and save it as a compressed numpy file."""
     try:
-        # Load image using PIL and convert to RGB
+        # load image using PIL and convert to RGB
         img = Image.open(image_path).convert("RGB")
         # resize image (256x256 original images become 224x224 after processing)
         img = img.resize((256, 256))
         img_array = np.array(img).astype(np.float32)
 
-        # Apply training preprocessing
+        # apply training preprocessing
         preprocessed_tensor = preprocess_for_train(img_array, target_size)
-        # Convert back to numpy array for saving.
+        # convert back to numpy array for saving.
         preprocessed = preprocessed_tensor.numpy()
     except Exception as e:
         print(f"Error processing {image_path}: {e}")
         return
 
-    # Create output directory for the category if it doesn't exist
+    # create output directory for the category if it doesn't exist
     category_dir = os.path.join(output_base, category)
     os.makedirs(category_dir, exist_ok=True)
 
-    # Save the compressed image
+    # save the compressed image
     filename = os.path.basename(image_path)
     output_path = os.path.join(category_dir, os.path.splitext(filename)[0] + ".npz")
     try:
@@ -97,10 +99,10 @@ def process_and_save_image(image_path, username, category):
 
 
 def main():
-    # Return dictionary to map username to category
+    # return dictionary to map username to category
     mapping = load_mapping(mapping_file)
 
-    # Process each image in the image directory
+    # process each image in the image directory
     for filename in os.listdir(image_dir):
         if filename.lower().endswith((".jpg", ".jpeg", ".png")):
             if "-" not in filename:

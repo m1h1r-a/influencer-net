@@ -41,7 +41,7 @@ def process_and_save_image(image_path, username, category):
         # expand dimensions of image
         # (224, 224, 3) to (1, 224, 224, 3)
         img_batch = np.expand_dims(img_array, axis=0)
-        # Preprocess image using EfficientNetV2's preprocess_input (scales to [-1, 1])
+        # Preprocess image using EfficientNetV2's preprocess_input
         preprocessed = preprocess_input(img_batch)
         # Remove the batch dimension
         preprocessed = preprocessed[0]
