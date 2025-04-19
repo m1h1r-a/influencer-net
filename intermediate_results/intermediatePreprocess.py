@@ -65,7 +65,7 @@ def process_and_save_image(image_path, username, category):
         img_batch = np.expand_dims(img_array, axis=0)
         np.save(os.path.join(debug_dir, "5_batch.npy"), img_batch)
 
-        # Preprocess image using EfficientNetV2's preprocess_input (scales to [-1, 1])
+        # Preprocess image using EfficientNetV2's preprocess_input 
         preprocessed = preprocess_input(img_batch)
         np.save(os.path.join(debug_dir, "6_preprocessed_batch.npy"), preprocessed)
 

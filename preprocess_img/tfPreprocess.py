@@ -29,15 +29,6 @@ def load_mapping(mapping_path):
 
 
 def preprocess_for_train(image, target_size):
-    """Applies training augmentations: random crop, random flip, resize, and normalization.
-
-    Args:
-      image: a tf.Tensor of shape [height, width, 3] with pixel values in [0, 255].
-      target_size: tuple (height, width) for the output image.
-
-    Returns:
-      A tf.Tensor with shape target_size and pixel values normalized to [-1, 1].
-    """
     # conver to tensor, random crop it, resize, to 224x224, random flipping, normalization to [-1,1]
 
     image = tf.convert_to_tensor(image, dtype=tf.float32)
@@ -48,13 +39,13 @@ def preprocess_for_train(image, target_size):
     begin, size, _ = tf.image.sample_distorted_bounding_box(
         shape,
         tf.zeros([0, 0, 4], tf.float32),
-        area_range=(0.05, 1.0),
+        area_range=(0.5, 1.0),
         min_object_covered=0,
         use_image_if_no_bounding_boxes=True,
     )
     cropped = tf.slice(image, begin, size)
 
-    # resize the cropped image to the target size using bilinear interpolation.
+    # resize the cropped image to the target size using bilinear interpolation to (224x224)
     resized = tf.image.resize(cropped, target_size)
 
     # Random horizontal flip.

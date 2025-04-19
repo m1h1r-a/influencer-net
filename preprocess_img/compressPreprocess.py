@@ -31,6 +31,7 @@ def load_mapping(mapping_path):
 
 def process_and_save_image(image_path, username, category):
     """Process an image and save it as a compressed numpy file."""
+    # process and save as compressed numpy file
     try:
         # Load and preprocess the image
         img = Image.open(image_path).convert("RGB")

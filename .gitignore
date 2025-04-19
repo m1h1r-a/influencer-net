@@ -1,4 +1,5 @@
-image/
 testImage/
-mainDataset
+dataset/
+classification_output/
 intermediate_results/notesImgPreprocessing.md
+instructions.txt
