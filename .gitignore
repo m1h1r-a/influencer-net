@@ -215,6 +215,7 @@ intermediate_results/
 classification_output/
 testImage/
 dataset/
+final_models/
 
 # But keep structure files and small samples
 !data/raw/JSON-Image_files_mapping.txt
