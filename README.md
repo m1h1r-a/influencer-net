@@ -41,6 +41,131 @@ influencer-net/
     └── prediction_samples.png
 ```
 
+## Architecture & Flow Diagrams
+
+### System Architecture
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Raw Dataset   │    │  Data Sampling  │    │  Preprocessed   │
+│                 │───▶│                 │───▶│    Images       │
+│ • Images        │    │ minimize_data.py│    │   (.npz files)  │
+│ • Metadata      │    │ (50/category)   │    │   224x224x3     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                       │
+                                                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Predictions   │    │  Feature Vector │    │ EfficientNetV2  │
+│                 │◀───│                 │◀───│   Training      │
+│ • Category      │    │ 2048 dimensions │    │                 │
+│ • Confidence    │    │   (.npz files)  │    │ • 3-Phase       │
+│ • Top-3         │    │                 │    │ • Mixed Prec.   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         ▲                       │                       │
+         │                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Attention Model │    │Feature Extractor│    │   Checkpoints   │
+│                 │    │                 │    │                 │
+│ • PostAttention │    │ extract_image_  │    │ • Phase models  │
+│ • Classification│    │ features.py     │    │ • Best weights  │
+│ • 9 categories  │    │                 │    │ • History plots │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Data Flow (Low-Level)
+```
+📁 dataset/
+├── influencers.txt ────┐
+├── JSON-mapping.txt ───┼─── minimize_data.py ───▶ 📁 data/samples/
+└── image/*.jpg ────────┘                           ├── smallInfluencers.txt
+                                                    └── smallMappings.txt
+                                                             │
+                                                             ▼
+📁 preprocess_img/                                  📁 data/processed/
+├── imgPreprocess.py ────────────────────────────▶ ├── *.npz (standard)
+└── compressPreprocess.py ───────────────────────▶ └── *.npz (compressed)
+                                                             │
+                                                             ▼
+📁 classify_images/                                 📁 models/checkpoints/
+├── classificationV3.py ─────────────────────────▶ ├── phase_1_model.keras
+│   ├── Phase 1: Frozen base (10 epochs)            ├── phase_2_model.keras
+│   ├── Phase 2: Fine-tune 50 layers (30 epochs)   ├── phase_3_model.keras
+│   └── Phase 3: Fine-tune 100 layers (10 epochs)  └── feature_extractor.keras
+└── extract_image_features.py ──────────────────▶ 📁 data/features/
+                                                    └── *.npz (2048-dim vectors)
+                                                             │
+                                                             ▼
+📁 final_models/                                    📁 models/final/
+├── final_classification.py ─────────────────────▶ ├── attention_model.keras
+│   ├── Feature Embedding (2048→512)               └── best_attention.keras
+│   ├── PostAttentionLayer                                  │
+│   └── Classification Head (512→256→9)                     ▼
+└── run_classification.py ───────────────────────▶ 📁 outputs/results/
+                                                    ├── predictions.json
+                                                    └── confidence_scores.csv
+```
+
+### Training Pipeline (Execution Order)
+```
+[1] Data Prep     [2] Preprocessing    [3] Base Training      [4] Feature Extract
+    │                 │                   │                      │
+    ▼                 ▼                   ▼                      ▼
+minimize_data.py   imgPreprocess.py   classificationV3.py   extract_image_
+    │                 │                   │                features.py
+    ▼                 ▼                   ▼                      │
+samples/*.txt ──▶ processed/*.npz ──▶ checkpoints/*.keras ──▶   ▼
+                                        │                 features/*.npz
+                                        ▼                      │
+[6] Inference   [5] Attention Training  │                      ▼
+    │               │ ◀──────────────────┘           [5] final_classification.py
+    ▼               ▼                                        │
+run_classification  final_classification.py                 ▼
+    │               │                                  final/*.keras
+    ▼               ▼
+results/*.json  final_models/*.keras
+```
+
+### Model Architecture Details
+```
+Input Image (224x224x3)
+         │
+         ▼
+┌─────────────────────────┐
+│    EfficientNetV2-S     │ ◀── Pre-trained ImageNet
+│     (Base Network)      │
+└─────────────────────────┘
+         │
+         ▼ (2048 features)
+┌─────────────────────────┐
+│   Feature Extractor     │ ◀── Saved after training
+│    (Frozen Inference)   │
+└─────────────────────────┘
+         │
+         ▼ (2048-dim vector)
+┌─────────────────────────┐
+│  Feature Embedding      │ ◀── 2048 → 512 Dense
+│    + Batch Norm         │
+└─────────────────────────┘
+         │
+         ▼ (512-dim)
+┌─────────────────────────┐
+│  PostAttentionLayer     │ ◀── Custom attention mechanism
+│  • Query/Key/Value      │     - Self-attention weights
+│  • Attention Weights    │     - Context-aware features  
+│  • Weighted Features    │
+└─────────────────────────┘
+         │
+         ▼ (512-dim weighted)
+┌─────────────────────────┐
+│  Classification Head    │ ◀── 512 → 256 → 9
+│  • Dense(256) + ReLU    │     - Dropout(0.5)
+│  • Dense(9) + Softmax   │     - 9 category output
+└─────────────────────────┘
+         │
+         ▼
+    Predictions (9 classes)
+    + Attention Visualization
+```
+
 ## High-Level Workflow
 
 ```

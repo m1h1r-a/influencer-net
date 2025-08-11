@@ -205,19 +205,28 @@ Thumbs.db
 ehthumbs.db
 Thumbs.db
 
-# Project specific
+# Project specific - Updated for reorganized structure
 # Keep small sample data but ignore large datasets
 data/raw/images/
-data/processed/
-models/
-examples/*.npz
-intermediate_results/
+data/processed/large_files/
+data/features/
+models/checkpoints/
+models/final/
+outputs/plots/
+outputs/results/
+experiments/large_outputs/
+dataset/
 classification_output/
 testImage/
-dataset/
-final_models/
+
+# Backup folder containing original project structure
+backup/
 
 # But keep structure files and small samples
 !data/raw/JSON-Image_files_mapping.txt
 !data/raw/influencers.txt
 !data/samples/
+!models/final/small_models/
+!config/
+!docs/
+!src/
