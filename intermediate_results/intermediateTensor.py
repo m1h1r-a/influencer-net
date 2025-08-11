@@ -5,10 +5,10 @@ import tensorflow as tf
 from PIL import Image
 
 # Paths defined
-base_dir = "/home/m1h1r/Documents/[2] dev/influencer-net"
-ssd_dir = "/run/media/m1h1r/04E884E1E884D1FA"
+base_dir = "/home/m1h1r/Documents/[2] dev/influencer-net/intermediate_results"
+ssd_dir = "/home/m1h1r/Documents/[2] dev/influencer-net/intermediate_results"
 image_dir = os.path.join(base_dir, "testImage")
-mapping_file = os.path.join(base_dir, "data_sampling/smallInfluencers.txt")
+mapping_file = os.path.join(base_dir, "smallInfluencers.txt")
 output_base = os.path.join(ssd_dir, "debugTensor")
 
 # Define the target image size for EfficientNetV2‑S (224×224)
