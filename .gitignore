@@ -1,6 +1,222 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Machine Learning & Data Science
+# Models - typically too large for git
+*.h5
+*.keras
+*.pkl
+*.pickle
+*.joblib
+*.model
+*.pb
+*.ckpt
+*.pth
+*.pt
+*.weights
+
+# Data files - typically too large for git
+*.csv
+*.tsv
+*.json
+*.parquet
+*.feather
+*.hdf5
+*.npz
+*.npy
+*.mat
+
+# Images and media
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.svg
+*.ico
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mp3
+*.wav
+*.ogg
+
+# Logs and temporary files
+*.log
+*.out
+*.tmp
+*.temp
+logs/
+*.log.*
+
+# TensorFlow
+*.ckpt.*
+checkpoint
+*.tfrecords
+*.tflite
+*.pb
+
+# PyTorch
+lightning_logs/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Weights & Biases
+wandb/
+
+# DVC (Data Version Control)
+.dvc
+.dvcignore
+
+# Experiment outputs and results
+outputs/
+results/
+checkpoints/
+experiments/*/output/
+experiments/*/logs/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+# Keep small sample data but ignore large datasets
+data/raw/images/
+data/processed/
+models/
+examples/*.npz
+intermediate_results/
+classification_output/
 testImage/
 dataset/
-classification_output/
-intermediate_results/notesImgPreprocessing.md
-instructions.txt
-project_details.md
+
+# But keep structure files and small samples
+!data/raw/JSON-Image_files_mapping.txt
+!data/raw/influencers.txt
+!data/samples/
